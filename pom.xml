@@ -14,9 +14,17 @@
 	<name>spring-boot-yara</name>
 	<description>Project Rest Api for Yara</description>
 	<properties>
+		<docker.image.prefix>hedonsbyara.azurecr.io</docker.image.prefix>
 		<java.version>11</java.version>
+		<jib-maven-plugin.version>3.2.0</jib-maven-plugin.version>
+		<!-- The main class to start by executing "java -jar" -->
+      	<start-class>com.hedon.springbootyara.SpringBootYaraApplication</start-class>
 	</properties>
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -38,6 +46,11 @@
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.6.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -45,6 +58,19 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>${jib-maven-plugin.version}</version>
+				<configuration>
+					<from>
+						<image>openjdk:11</image>
+					</from>
+					<to>
+						<image>${docker.image.prefix}/${project.artifactId}</image>
+					</to>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

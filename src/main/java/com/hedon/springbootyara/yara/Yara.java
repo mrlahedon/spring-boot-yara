@@ -24,9 +24,9 @@ public class Yara {
 		return this;
 	}
 
-	public String scan(File file, File cmd) {
+	public List<String> scan(File file, File cmd) {
 		log.info("start scan file: " + file.getName());
-		log.info("execute: yara " + rules.get(0).getAbsolutePath() + " " + file.getAbsolutePath());
+		log.info("execute: " + cmd.getAbsolutePath() + " " + rules.get(0).getAbsolutePath() + " " + file.getAbsolutePath());
 
 		List<String> command = new ArrayList<String>();
         command.add(cmd.getAbsolutePath());
@@ -42,9 +42,10 @@ public class Yara {
 		return execute();
 	}
 
-	private String execute() {
+	private List<String> execute() {
 	// private String execute(File file, File cmd) {
 		StringBuilder sb = new StringBuilder();
+		List<String> result = new ArrayList<String>();
 		
 		try {
 			Process process = processBuilder.start();
@@ -53,12 +54,13 @@ public class Yara {
 			
 			while ((line = reader.readLine()) != null) {
 				log.info(line);
+				result.add(line);
 				sb.append(line + System.lineSeparator());
 			}
 			
 			int exitCode = process.waitFor();
 
-			if (sb != null && !sb.isEmpty() && exitCode == 0) {
+			if (sb != null && exitCode == 0) {
 				sb.append(System.lineSeparator());
 				printResult("result", sb.toString());
 			}
@@ -90,9 +92,19 @@ public class Yara {
 		} catch (InterruptedException ex) {
 			log.error("execute interrupted", ex);
 		} */
+		File yourFile = new File("score.txt");
+		log.info(yourFile.getAbsolutePath());
+		// try {
+		// 	yourFile.createNewFile();
+		// 	log.info(yourFile.getAbsolutePath());
+		// } catch (IOException e) {
+		// 	e.printStackTrace();
+		// } // if file already exists will do nothing 
 		
+		// FileOutputStream oFile = new FileOutputStream(yourFile, false); 
 		log.info("Program terminated!");
-		return sb.toString();
+		// return sb.toString();
+		return result;
 	}
 
 	private static void printResult(String fileName, String result) {

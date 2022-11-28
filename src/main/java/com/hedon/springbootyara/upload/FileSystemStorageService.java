@@ -1,5 +1,6 @@
 package com.hedon.springbootyara.upload;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -109,6 +110,24 @@ public class FileSystemStorageService implements StorageRepository{
 		Path fileToDeletePath = load(filename);
 		FileSystemUtils.deleteRecursively(fileToDeletePath.toFile());
 
+	}
+
+	@Override
+	public void copyFile(String filePath) {
+		Path fileToCopyPath = Paths.get(filePath);
+		Path destPath = Paths.get("." + File.separator + fileToCopyPath.getFileName().toString());
+		
+		if(destPath.toFile().exists()) {
+			System.out.println("Nama file : "+ fileToCopyPath.getFileName().toString() + " , " + destPath.toString());
+		}
+
+		try {
+			if(!destPath.toFile().exists()) {
+				Files.copy(fileToCopyPath, destPath, StandardCopyOption.REPLACE_EXISTING);
+			}
+		} catch (IOException e) {
+			throw new StorageException("Failed to copy files", e);
+		}
 	}
     
 }

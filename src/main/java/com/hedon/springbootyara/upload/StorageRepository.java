@@ -20,4 +20,6 @@ public interface StorageRepository {
 	void deleteFile(String filename);
 
 	void deleteAll();
+
+	void copyFile(String filename);
 }

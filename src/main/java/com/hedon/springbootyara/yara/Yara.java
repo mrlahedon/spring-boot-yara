@@ -58,6 +58,7 @@ public class Yara {
 				sb.append(line + System.lineSeparator());
 			}
 			
+			reader.close();
 			int exitCode = process.waitFor();
 
 			if (sb != null && exitCode == 0) {
@@ -92,16 +93,7 @@ public class Yara {
 		} catch (InterruptedException ex) {
 			log.error("execute interrupted", ex);
 		} */
-		File yourFile = new File("score.txt");
-		log.info(yourFile.getAbsolutePath());
-		// try {
-		// 	yourFile.createNewFile();
-		// 	log.info(yourFile.getAbsolutePath());
-		// } catch (IOException e) {
-		// 	e.printStackTrace();
-		// } // if file already exists will do nothing 
 		
-		// FileOutputStream oFile = new FileOutputStream(yourFile, false); 
 		log.info("Program terminated!");
 		// return sb.toString();
 		return result;
@@ -109,7 +101,8 @@ public class Yara {
 
 	private static void printResult(String fileName, String result) {
 		try {
-			File file = new File("src/main/resources/"+ fileName +".txt");
+			// File file = new File("src/main/resources/"+ fileName +".txt");
+			File file = new File(fileName +".txt");
 			FileWriter writer = new FileWriter(file, true);
 			writer.write(result);
 			writer.close();

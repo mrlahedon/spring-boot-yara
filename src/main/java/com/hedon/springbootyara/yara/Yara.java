@@ -5,16 +5,23 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.hedon.springbootyara.upload.StorageException;
+
 @Component
 public class Yara {
     private static final Logger log = LoggerFactory.getLogger(Yara.class);
+	private Path rulesPath = Paths.get("rules");
 	private ProcessBuilder processBuilder = new ProcessBuilder();
 	private List<File> rules = new ArrayList<File>();
 
@@ -24,14 +31,35 @@ public class Yara {
 		return this;
 	}
 
+	public List<Path> loadAllRules() {
+        try {
+			System.out.println("Lokasi file loadALLRUles : "+ this.rulesPath.toString());
+
+			List<Path> result = Files.walk(this.rulesPath, 1)
+				.filter(Files::isRegularFile)
+				// .map(this.rulesPath::relativize)
+				.collect(Collectors.toList());
+
+			return result;
+		}
+		catch (IOException e) {
+			throw new StorageException("Failed to read files", e);
+		}
+    }
+
 	public List<String> scan(File file, File cmd) {
 		log.info("start scan file: " + file.getName());
-		log.info("execute: " + cmd.getAbsolutePath() + " " + rules.get(0).getAbsolutePath() + " " + file.getAbsolutePath());
-
+		List<Path> paths = loadAllRules();
+        // paths.forEach(x -> System.out.println(x));
+		
 		List<String> command = new ArrayList<String>();
         command.add(cmd.getAbsolutePath());
-		command.add(rules.get(0).getAbsolutePath());
+		command.add("-m");
+		paths.forEach(x -> command.add(x.toAbsolutePath().toString()));
+		// command.add(rules.get(0).getAbsolutePath());
 		command.add(file.getAbsolutePath());
+
+		log.info("execute: " + command);
 
 		// processBuilder.command("/bin/bash", "-c",
 		// processBuilder.command(cmd.getAbsolutePath() + " " + rules.get(0).getAbsolutePath() + " " + file.getAbsolutePath());

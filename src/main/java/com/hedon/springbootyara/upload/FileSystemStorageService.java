@@ -21,17 +21,20 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileSystemStorageService implements StorageRepository{
 
     private final Path rootLocation;
+	private final Path ruleLocation;
 
 	@Autowired
 	public FileSystemStorageService(StorageProperties properties) {
 		this.rootLocation = Paths.get(properties.getLocation());
+		this.ruleLocation = Paths.get(properties.getRuleLoc());
 	}
 
     @Override
     public void init() {
         try {
 			Files.createDirectories(rootLocation);
-			System.out.println("Lokasi file init : "+ this.rootLocation.toString());
+			Files.createDirectories(ruleLocation);
+			// System.out.println("Lokasi file init : "+ this.rootLocation.toString());
 		}
 		catch (IOException e) {
 			throw new StorageException("Could not initialize storage", e);
@@ -127,6 +130,30 @@ public class FileSystemStorageService implements StorageRepository{
 			}
 		} catch (IOException e) {
 			throw new StorageException("Failed to copy files", e);
+		}
+	}
+
+	@Override
+	public void storeRule(MultipartFile file) {
+		try {
+			if (file.isEmpty()) {
+				throw new StorageException("Failed to store empty file.");
+			}
+			Path destinationFile = this.ruleLocation.resolve(
+					Paths.get(file.getOriginalFilename()))
+					.normalize().toAbsolutePath();
+			if (!destinationFile.getParent().equals(this.ruleLocation.toAbsolutePath())) {
+				// This is a security check
+				throw new StorageException(
+						"Cannot store file outside current directory.");
+			}
+			try (InputStream inputStream = file.getInputStream()) {
+				Files.copy(inputStream, destinationFile,
+					StandardCopyOption.REPLACE_EXISTING);
+			}
+		}
+		catch (IOException e) {
+			throw new StorageException("Failed to store file.", e);
 		}
 	}
     

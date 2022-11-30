@@ -11,6 +11,8 @@ public interface StorageRepository {
 
 	void store(MultipartFile file);
 
+	void storeRule(MultipartFile file);
+
 	Stream<Path> loadAll();
 
 	Path load(String filename);

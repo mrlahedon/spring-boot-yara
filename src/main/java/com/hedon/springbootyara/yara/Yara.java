@@ -146,13 +146,13 @@ public class Yara {
 			// JsonNode jsonNode = stringToJSONObject(res2[1].replace("=", ":"));
 			// JsonNode jsonNode = stringToJSONObject(jsonString);
 			hashMap.put("rulename", res2[0]);
-			System.out.println("Panjang res2[1] : "+ res2[1].length());
+			// System.out.println("res2[1] length : "+ res2[1].length());
 			if(res2[1].length() > 0) {
 				String[] res3 = res2[1].trim().split(",");
 				for (String s : res3) {
-					System.out.println(s);
+					// System.out.println(s);
 					String[] metaElement = s.trim().split("=");
-					System.out.println("Panjang metaElement : "+ metaElement.length);
+					// System.out.println("metaElement length : "+ metaElement.length);
 					String metaKey = metaElement[0].trim();
 					String metaValue = metaElement[1].trim();
 					hashMap.put(metaKey, metaValue);

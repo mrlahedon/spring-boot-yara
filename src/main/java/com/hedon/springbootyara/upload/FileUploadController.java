@@ -69,6 +69,27 @@ public class FileUploadController  {
         return "redirect:/api/upload";
 	}
 
+	@GetMapping("/upload/rules")
+	public String listUploadedRules(Model model) throws IOException {
+
+        // model.addAttribute("files", storageService.loadAll().map(path -> path.toString())
+		// 		.filter(f -> f.endsWith(".yara")).collect(Collectors.toList()));
+
+		return "uploadRule";
+	}
+
+	@PostMapping("/upload/rules")
+	public String handleRulesUpload(@RequestParam("file") MultipartFile file,
+			RedirectAttributes redirectAttributes) {
+
+		storageService.storeRule(file);
+		redirectAttributes.addFlashAttribute("message",
+				"You successfully uploaded " + file.getOriginalFilename() + "!");
+
+        // return "redirect:/api/scan/" + file.getOriginalFilename();
+        return "redirect:/api/upload/rules";
+	}
+
 	@ExceptionHandler(StorageFileNotFoundException.class)
 	public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
 		return ResponseEntity.notFound().build();

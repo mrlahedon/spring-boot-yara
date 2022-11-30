@@ -31,8 +31,8 @@ public class YaraResource {
     @GetMapping("/scan/{file}")
     public Map<String, String> resultScan(@PathVariable String file) throws URISyntaxException
     {
-        System.out.println(file);
-        System.out.println(cmd.getAbsolutePath());
+        // System.out.println(file);
+        // System.out.println(cmd.getAbsolutePath());
 		yara.addRule(RULE);
 		Map<String, String> result = yara.scan(storageService.load(file).toFile(), cmd);
         // storageService.deleteFile(file);

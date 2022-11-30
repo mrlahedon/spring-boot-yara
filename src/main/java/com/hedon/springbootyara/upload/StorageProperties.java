@@ -13,8 +13,13 @@ import lombok.Setter;
 public class StorageProperties  {
 
     /**
-	 * Folder location for storing files
+	 * Folder location for storing files sample
 	 */
 	private String location = "upload-dir";
+
+	/**
+	 * Folder location for storing files rule
+	 */
+	private String ruleLoc = "rules";
     
 }

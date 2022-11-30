@@ -2,6 +2,7 @@ package com.hedon.springbootyara.yara;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,12 @@ public class YaraResource {
     private Yara yara;
 
     @GetMapping("/scan/{file}")
-    public Map<String, String> resultScan(@PathVariable String file) throws URISyntaxException
+    public List<Map<String, String>> resultScan(@PathVariable String file) throws URISyntaxException
     {
         // System.out.println(file);
         // System.out.println(cmd.getAbsolutePath());
 		yara.addRule(RULE);
-		Map<String, String> result = yara.scan(storageService.load(file).toFile(), cmd);
+		List<Map<String, String>> result = yara.scan(storageService.load(file).toFile(), cmd);
         // storageService.deleteFile(file);
         return result;
     }

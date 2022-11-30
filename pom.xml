@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.hedon</groupId>
 	<artifactId>spring-boot-yara</artifactId>
-	<version>0.0.8</version>
+	<version>0.0.9</version>
 	<name>spring-boot-yara</name>
 	<description>Project Rest Api for Yara</description>
 	<properties>

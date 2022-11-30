@@ -53,7 +53,7 @@ public class Yara {
 		}
     }
 
-	public Map<String, String>/* List<String> */ scan(File file, File cmd) {
+	public List<Map<String, String>>/* List<String> */ scan(File file, File cmd) {
 		log.info("start scan file: " + file.getName());
 		List<Path> paths = loadAllRules();
         // paths.forEach(x -> System.out.println(x));
@@ -76,7 +76,7 @@ public class Yara {
 		return execute();
 	}
 
-	private Map<String, String>/* List<String> */ execute() {
+	private List<Map<String, String>>/* List<String> */ execute() {
 	// private String execute(File file, File cmd) {
 		StringBuilder sb = new StringBuilder();
 		List<String> result = new ArrayList<String>();
@@ -139,8 +139,11 @@ public class Yara {
 			log.error("execute interrupted", ex);
 		} */
 
-		Map<String, String> hashMap = new HashMap<String, String>();
+		List<Map<String, String>> data = new ArrayList<Map<String, String>>();
+		
+		System.out.println("res length : "+ res.size());
 		for (String[] res2 : res) {
+			Map<String, String> hashMap = new HashMap<String, String>();
 			// String jsonString = "{\"phonetype\":\"N95\",\"cat\":\"WP\"}";
 			// String jsonString = "{\"author\":\"hedon\",\"date\":\"11\\/06\\/2022\",\"description\":\"This is basic YARA rule for Ascii example\",\"version\" :\"1\",\"block\":\"true\"}"; 
 			// JsonNode jsonNode = stringToJSONObject(res2[1].replace("=", ":"));
@@ -158,14 +161,13 @@ public class Yara {
 					hashMap.put(metaKey, metaValue);
 				}
 			}
-			
-			// System.out.println(jsonNode);
-			// System.out.println("{"+res2[1].replace("=", ":")+"}");
+			System.out.println("hashMap : "+hashMap);
+			data.add(hashMap);
 		}
 
 		log.info("Program terminated!");
 		// return sb.toString();
-		return hashMap;
+		return data;
 	}
 
 	private static void printResult(String fileName, String result) {

@@ -9,13 +9,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hedon.springbootyara.upload.StorageException;
 
 @Component
@@ -47,7 +53,7 @@ public class Yara {
 		}
     }
 
-	public List<String> scan(File file, File cmd) {
+	public Map<String, String>/* List<String> */ scan(File file, File cmd) {
 		log.info("start scan file: " + file.getName());
 		List<Path> paths = loadAllRules();
         // paths.forEach(x -> System.out.println(x));
@@ -70,17 +76,28 @@ public class Yara {
 		return execute();
 	}
 
-	private List<String> execute() {
+	private Map<String, String>/* List<String> */ execute() {
 	// private String execute(File file, File cmd) {
 		StringBuilder sb = new StringBuilder();
 		List<String> result = new ArrayList<String>();
+		List<String[]> res = new ArrayList<String[]>();
 		
 		try {
 			Process process = processBuilder.start();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String line;
+			String[] trimAndSplitUnicode;
 			
 			while ((line = reader.readLine()) != null) {
+				String replace = line.replace(" [", ";");
+				replace = replace.replace("] ", ";");
+				trimAndSplitUnicode = replace.trim().split(";");
+				// for (String string : trimAndSplitUnicode) {
+				// 	System.out.println(string);
+				// }
+				
+				// System.out.println(replace);
+				res.add(trimAndSplitUnicode);
 				log.info(line);
 				result.add(line);
 				sb.append(line + System.lineSeparator());
@@ -121,10 +138,34 @@ public class Yara {
 		} catch (InterruptedException ex) {
 			log.error("execute interrupted", ex);
 		} */
-		
+
+		Map<String, String> hashMap = new HashMap<String, String>();
+		for (String[] res2 : res) {
+			// String jsonString = "{\"phonetype\":\"N95\",\"cat\":\"WP\"}";
+			// String jsonString = "{\"author\":\"hedon\",\"date\":\"11\\/06\\/2022\",\"description\":\"This is basic YARA rule for Ascii example\",\"version\" :\"1\",\"block\":\"true\"}"; 
+			// JsonNode jsonNode = stringToJSONObject(res2[1].replace("=", ":"));
+			// JsonNode jsonNode = stringToJSONObject(jsonString);
+			hashMap.put("rulename", res2[0]);
+			System.out.println("Panjang res2[1] : "+ res2[1].length());
+			if(res2[1].length() > 0) {
+				String[] res3 = res2[1].trim().split(",");
+				for (String s : res3) {
+					System.out.println(s);
+					String[] metaElement = s.trim().split("=");
+					System.out.println("Panjang metaElement : "+ metaElement.length);
+					String metaKey = metaElement[0].trim();
+					String metaValue = metaElement[1].trim();
+					hashMap.put(metaKey, metaValue);
+				}
+			}
+			
+			// System.out.println(jsonNode);
+			// System.out.println("{"+res2[1].replace("=", ":")+"}");
+		}
+
 		log.info("Program terminated!");
 		// return sb.toString();
-		return result;
+		return hashMap;
 	}
 
 	private static void printResult(String fileName, String result) {
@@ -137,5 +178,18 @@ public class Yara {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static JsonNode stringToJSONObject(String jsonString) {
+		ObjectMapper jacksonObjMapper = new ObjectMapper();
+		JsonNode jsonNode = null;
+		try {
+			jsonNode = jacksonObjMapper.readTree(jsonString);
+		} catch (JsonMappingException e) {
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return jsonNode;
 	}
 }
